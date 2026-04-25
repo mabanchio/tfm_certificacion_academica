@@ -1,4 +1,4 @@
-# Sistema de Certificacion Academica Digital (Argentina)
+# Sistema de Certificacion Academica Digital
 
 Este repositorio implementa un sistema blockchain para gestionar el circuito de certificacion de titulos en Argentina.
 
