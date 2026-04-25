@@ -1,0 +1,8 @@
+version: "2"
+tunnels:
+  rpc:
+    proto: http
+    addr: 8899
+  verify:
+    proto: http
+    addr: 3000

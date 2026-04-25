@@ -1,0 +1,90 @@
+# -----------------------------
+# Exclusiones de documentacion no versionable
+# -----------------------------
+roadmap.md
+TFM_SOLANA_ACADEMIC_CERTIFICATES_TECHNICAL_GUIDE.md
+
+# -----------------------------
+# Archivos grandes y binarios
+# -----------------------------
+*.zip
+*.7z
+*.tar
+*.gz
+*.rar
+*.iso
+*.dmg
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.psd
+*.ai
+*.sqlite
+*.db
+*.bak
+*.tmp
+*.log
+*.odt
+*.doc
+*.docx
+*.ppt
+*.pptx
+
+# -----------------------------
+# Entorno y secretos
+# -----------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+*.seed
+*.secret
+wallets.json
+wallets.local.json
+
+# Solana / Anchor claves y artefactos locales
+*.json.keypair
+*keypair*.json
+test-ledger/
+.anchor/
+
+# -----------------------------
+# Node / Next
+# -----------------------------
+node_modules/
+.next/
+out/
+coverage/
+.npm/
+.pnpm-store/
+
+# -----------------------------
+# Rust
+# -----------------------------
+target/
+Cargo.lock
+
+# -----------------------------
+# SO / Editor
+# -----------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# -----------------------------
+# Tuneles y tooling local
+# -----------------------------
+.ngrok2/
+ngrok.log
+
+# -----------------------------
+# Artefactos documentales locales
+# -----------------------------
+certificacion_academica/storage/

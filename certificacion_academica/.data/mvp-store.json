@@ -1,0 +1,110 @@
+{
+  "certificaciones": [
+    {
+      "codigoRegistro": "1FD8AD999C3D1A254594",
+      "titular": {
+        "nombre": "Maria",
+        "apellido": "Perez",
+        "cuitCuil": "20329642330"
+      },
+      "tipoCredencial": "Diploma",
+      "programa": "Ingenieria en Sistemas",
+      "institucion": "Universidad Nacional de Tecnologia Aplicada",
+      "estado": "Apostillado",
+      "flujo": [
+        {
+          "actor": "Universidad",
+          "paso": "Emision",
+          "fecha": "2026-04-10",
+          "estado": "Completado"
+        },
+        {
+          "actor": "Universidad",
+          "paso": "Legalizacion interna",
+          "fecha": "2026-04-11",
+          "estado": "Completado"
+        },
+        {
+          "actor": "Ministerio",
+          "paso": "Validacion ministerial",
+          "fecha": "2026-04-12",
+          "estado": "Completado"
+        },
+        {
+          "actor": "Cancilleria",
+          "paso": "Apostilla",
+          "fecha": "2026-04-13",
+          "estado": "Completado"
+        }
+      ]
+    },
+    {
+      "codigoRegistro": "4B4BE2F90CB9A3F066D0",
+      "titular": {
+        "nombre": "Lucia",
+        "apellido": "Gomez",
+        "cuitCuil": "20329642330"
+      },
+      "tipoCredencial": "Certificado",
+      "programa": "Abogacia",
+      "institucion": "Instituto Superior Federal del Litoral",
+      "estado": "En proceso",
+      "flujo": [
+        {
+          "actor": "Universidad",
+          "paso": "Emision",
+          "fecha": "2026-04-15",
+          "estado": "Completado"
+        },
+        {
+          "actor": "Universidad",
+          "paso": "Legalizacion interna",
+          "fecha": "2026-04-16",
+          "estado": "Completado"
+        },
+        {
+          "actor": "Ministerio",
+          "paso": "Validacion ministerial",
+          "fecha": "",
+          "estado": "Pendiente"
+        },
+        {
+          "actor": "Cancilleria",
+          "paso": "Apostilla",
+          "fecha": "",
+          "estado": "Pendiente"
+        }
+      ]
+    }
+  ],
+  "solicitudesRol": [
+    {
+      "id": "ROL-6D74E2-19DA5D56A4E",
+      "wallet": "CeW137pi692LZkK8CnzJYeYqCEJAJZVoWfJXZ9cMNatc",
+      "rolSolicitado": "EGRESADO",
+      "identificacion": {
+        "nombre": "Persistencia Test",
+        "entidad": "Entidad Test",
+        "documento": "DOC-22",
+        "email": "persist@test.com"
+      },
+      "estado": "pendiente",
+      "fechaSolicitud": "2026-04-19T13:02:00.270Z",
+      "fechaResolucion": "",
+      "resueltoPor": "",
+      "motivoResolucion": ""
+    }
+  ],
+  "rolesActivos": [
+    {
+      "wallet": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+      "rol": "ADMIN",
+      "estado": "activo",
+      "fechaAlta": "2026-04-19T13:01:51.142Z",
+      "fechaActualizacion": "2026-04-19T13:01:51.142Z"
+    }
+  ],
+  "solicitudesLotes": [],
+  "lotesTokens": [],
+  "tramitesExtranjero": []
+}

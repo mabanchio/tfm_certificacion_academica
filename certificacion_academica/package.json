@@ -1,0 +1,33 @@
+{
+  "license": "ISC",
+  "scripts": {
+    "dev": "NEXT_DIST_DIR=.next-dev next dev",
+    "build": "NEXT_DIST_DIR=.next-build next build",
+    "start": "NEXT_DIST_DIR=.next-build next start",
+    "ngrok:start:multi": "ngrok start --all --config scripts/ngrok.multi.yml",
+    "ngrok:start:verify": "ngrok http 3000",
+    "carga:verificaciones": "node scripts/carga_verificaciones.js",
+    "reporte:costos": "node scripts/reporte_costos_onchain.js",
+    "uat:smoke": "node scripts/uat_smoke.js",
+    "demo:etapa2": "node scripts/ejecutar_pipeline_documental.js",
+    "reindex:all": "node scripts/reindex_all.js",
+    "test:etapa2": "mocha -t 1000000 tests/etapa2_documental.test.js",
+    "test:etapa5": "mocha -t 1000000 tests/etapa5_observabilidad.test.js",
+    "test:etapa6": "mocha -t 1000000 tests/etapa6_preproduccion.test.js",
+    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "next": "14.2.15",
+    "qrcode": "^1.5.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^9.0.3",
+    "prettier": "^2.6.2"
+  }
+}

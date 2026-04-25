@@ -1,0 +1,1 @@
+export const WALLET_ADMIN_SISTEMA = "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd";

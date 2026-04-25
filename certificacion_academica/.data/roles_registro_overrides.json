@@ -1,0 +1,69 @@
+{
+  "4FG4iMMSuNuDBnhUbcQc6oTu8qJnCJjNT5tFnX1mT7ds|UNIVERSIDAD": {
+    "nombres": "Matias Alejandro",
+    "apellidos": "Banchio",
+    "nombre": "Banchio, Matias Alejandro",
+    "entidad": "COPROCIER",
+    "documento": "DNI:30166709|CUIT:20301667095",
+    "email": "matias.banchio@coprocierlorg.ar",
+    "universidad": "Universidad de Entre Ríos",
+    "paises": [],
+    "actualizadoPor": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+    "actualizadoPorNombre": "B8qunAna",
+    "actualizadoEn": "2026-04-21T19:19:37.722Z"
+  },
+  "9aEykqngWwkPoXuKC3JjGA3shL6DddDexVN82NdZN6yv|CANCILLERIA": {
+    "nombres": "Zobala",
+    "apellidos": "Pepe",
+    "nombre": "Pepe, Zobala",
+    "entidad": "Cancilleria España",
+    "documento": "DNI:29362456|CUIT:21293624566",
+    "email": "info@cancilleria.es",
+    "universidad": "",
+    "paises": [
+      "España"
+    ],
+    "actualizadoPor": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+    "actualizadoPorNombre": "B8qunAna",
+    "actualizadoEn": "2026-04-21T20:26:58.248Z"
+  },
+  "CeW137pi692LZkK8CnzJYeYqCEJAJZVoWfJXZ9cMNatc|MINISTERIO": {
+    "nombres": "Ramos",
+    "apellidos": "Alejandro",
+    "nombre": "Alejandro, Ramos",
+    "entidad": "Ministerio de Educación",
+    "documento": "DNI:26354889|CUIT:20263548895",
+    "email": "info@min.edu.ar",
+    "universidad": "",
+    "paises": [],
+    "actualizadoPor": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+    "actualizadoPorNombre": "B8qunAna",
+    "actualizadoEn": "2026-04-21T23:16:08.367Z"
+  },
+  "Can3or48BKzeiZHZXg6evBWkrtuK5Jj3HuzsR2ArouQU|EGRESADO": {
+    "nombres": "Omar",
+    "apellidos": "Rigoberto",
+    "nombre": "Rigoberto, Omar",
+    "entidad": "",
+    "documento": "DNI:13859442|CUIT:21013859442",
+    "email": "omar@gmail.com",
+    "universidad": "",
+    "paises": [],
+    "actualizadoPor": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+    "actualizadoPorNombre": "B8qunAna",
+    "actualizadoEn": "2026-04-21T23:17:21.264Z"
+  },
+  "4s1qvsm8x6nsGfGb55SH6o6aQvvtXhDhnZ97xLMxPHLu|EGRESADO": {
+    "nombres": "Edgardo Jose",
+    "apellidos": "Santos",
+    "nombre": "Santos, Edgardo Jose",
+    "entidad": "NO_APLICA_EGRESADO",
+    "documento": "DNI:96542321|CUIT:21965423215",
+    "email": "edgardo.s@hotmail.com",
+    "universidad": "",
+    "paises": [],
+    "actualizadoPor": "B8qunAnaG16EdD14ZpbLBBq7b8t7TYRgLJbYEtfQ6SZd",
+    "actualizadoPorNombre": "B8qunAna",
+    "actualizadoEn": "2026-04-21T23:17:37.835Z"
+  }
+}
