@@ -37,6 +37,19 @@ import {
 } from "../lib/cliente/roles_onchain";
 import { obtenerRolesOnchain } from "../lib/cliente/obtener_roles_onchain";
 import { obtenerTodosLosRolesOnchain } from "../lib/cliente/obtener_todos_roles_onchain";
+// Utilidad para obtener el perfil de un rol dado su wallet
+async function obtenerPerfil(wallet) {
+  if (!wallet) return null;
+  try {
+    const resp = await fetch(`/api/roles/perfil?wallet=${encodeURIComponent(wallet)}`);
+    const data = await resp.json();
+    if (data.ok) return data.data;
+    return null;
+  } catch {
+    return null;
+  }
+}
+// ...existing code...
 import { WALLET_ADMIN_SISTEMA } from "../lib/config/sistema";
 import { formatearFechaHora } from "../lib/cliente/fechas";
 
@@ -101,6 +114,18 @@ export default function AutoridadPage() {
     paises: "",
   });
   const [mensaje, setMensaje] = useState("");
+  const [perfilesRoles, setPerfilesRoles] = useState({});
+
+  // Cargar perfiles de todos los roles activos del sistema
+  async function cargarPerfilesRoles(roles) {
+    const wallets = Array.from(new Set((roles || []).map(r => r.wallet).filter(Boolean)));
+    const perfiles = {};
+    await Promise.all(wallets.map(async (wallet) => {
+      const perfil = await obtenerPerfil(wallet);
+      if (perfil) perfiles[wallet] = perfil;
+    }));
+    setPerfilesRoles(perfiles);
+  }
 
   const accesoAdmin = useMemo(
     () => rolesDisponibles.includes("ADMIN") || rolActual === "ADMIN",
@@ -135,18 +160,23 @@ export default function AutoridadPage() {
 
     // Si es admin, obtener todos los roles del sistema
     const rolesAdmin = rolesOnchain.ok && rolesOnchain.roles.some(r => r.rol === "ADMIN" && r.activo);
+
     if (rolesAdmin) {
       const todos = await obtenerTodosLosRolesOnchain();
       if (todos.ok) {
         setTodosRoles(todos.roles);
         setErrorRoles("");
+        // Cargar perfiles de los roles activos
+        cargarPerfilesRoles(todos.roles);
       } else {
         setTodosRoles([]);
         setErrorRoles(todos.error || "No se pudieron obtener los roles on-chain");
+        setPerfilesRoles({});
       }
     } else {
       setTodosRoles([]);
       setErrorRoles("");
+      setPerfilesRoles({});
     }
 
     // Mantener solicitudes para el panel
@@ -674,47 +704,70 @@ export default function AutoridadPage() {
                       .filter((item) => {
                         const q = String(filtroRolesBusqueda || "").trim().toLowerCase();
                         if (!q) return true;
+                        // Buscar también en los datos del perfil si existen
+                        const perfil = perfilesRoles[item.wallet] || {};
                         const texto = [
                           String(item.wallet || ""),
                           String(item.rol || ""),
-                          obtenerDatosPersonaRegistro(item).nombre,
-                          obtenerDatosPersonaRegistro(item).apellido,
-                          obtenerDatosPersonaRegistro(item).dni,
-                          obtenerDatosPersonaRegistro(item).email,
-                          obtenerDatosPersonaRegistro(item).entidad,
+                          perfil.nombreRegistrado || "",
+                          perfil.emailRegistrado || "",
+                          perfil.entidadRegistrada || "",
+                          perfil.dniRegistrado || "",
                         ].join(" ").toLowerCase();
                         return texto.includes(q);
                       })
-                      .map((item) => (
-                        <tr key={`${item.wallet}-${item.rol}`}>
-                          <td>{obtenerDatosPersonaRegistro(item).nombre}</td>
-                          <td>{obtenerDatosPersonaRegistro(item).apellido}</td>
-                          <td>{obtenerDatosPersonaRegistro(item).dni}</td>
-                          <td>{item.rol}</td>
-                          <td title={item.wallet}>{abreviarWallet(item.wallet)}</td>
-                          <td>{item.activo ? "Activo" : "Inactivo"}</td>
-                          <td>
-                            <button className="boton boton-xs" type="button" onClick={() => abrirDetalleRol(item)}>
-                              Ver detalle alta
-                            </button>
-                          </td>
-                          <td>
-                            {item.wallet !== WALLET_ADMIN_SISTEMA ? (
-                              item.activo ? (
-                                <button className="boton" style={{ minWidth: 110 }} onClick={() => deshabilitar(item.wallet, item.rol)}>
-                                  Deshabilitar
-                                </button>
+                      .map((item) => {
+                        const perfil = perfilesRoles[item.wallet] || {};
+                        // Separar nombre y apellido si viene en formato "Apellido, Nombre"
+                        let nombre = "-";
+                        let apellido = "-";
+                        if (perfil.nombreRegistrado) {
+                          const partes = perfil.nombreRegistrado.split(",");
+                          if (partes.length === 2) {
+                            apellido = partes[0].trim();
+                            nombre = partes[1].trim();
+                          } else {
+                            // Si no hay coma, intentar separar por espacio
+                            const palabras = perfil.nombreRegistrado.trim().split(/\s+/);
+                            if (palabras.length > 1) {
+                              nombre = palabras.slice(1).join(" ");
+                              apellido = palabras[0];
+                            } else {
+                              nombre = perfil.nombreRegistrado.trim();
+                            }
+                          }
+                        }
+                        return (
+                          <tr key={`${item.wallet}-${item.rol}`}>
+                            <td>{nombre}</td>
+                            <td>{apellido}</td>
+                            <td>{perfil.dniRegistrado || "-"}</td>
+                            <td>{item.rol}</td>
+                            <td title={item.wallet}>{abreviarWallet(item.wallet)}</td>
+                            <td>{item.activo ? "Activo" : "Inactivo"}</td>
+                            <td>
+                              <button className="boton boton-xs" type="button" onClick={() => abrirDetalleRol(item)}>
+                                Ver detalle alta
+                              </button>
+                            </td>
+                            <td>
+                              {item.wallet !== WALLET_ADMIN_SISTEMA ? (
+                                item.activo ? (
+                                  <button className="boton" style={{ minWidth: 110 }} onClick={() => deshabilitar(item.wallet, item.rol)}>
+                                    Deshabilitar
+                                  </button>
+                                ) : (
+                                  <button className="boton" style={{ minWidth: 110 }} onClick={() => habilitar(item.wallet, item.rol)}>
+                                    Habilitar
+                                  </button>
+                                )
                               ) : (
-                                <button className="boton" style={{ minWidth: 110 }} onClick={() => habilitar(item.wallet, item.rol)}>
-                                  Habilitar
-                                </button>
-                              )
-                            ) : (
-                              "Protegido"
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                                "Protegido"
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     {todosRoles.length === 0 ? (
                       <tr>
                         <td colSpan={8} style={{ color: "var(--texto-secundario)" }}>
