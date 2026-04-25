@@ -7,7 +7,8 @@ import BloqueAccesoRol from "../components/BloqueAccesoRol";
 import { useWalletSesion } from "../lib/cliente/wallet";
 import { solicitarLoteFirmadoDesdeBackpack } from "../lib/cliente/lotes_firmados";
 import { urlVerificacionRegistro } from "../lib/cliente/verificacion_url";
-import { asignarTokenUniversidadOnchainDesdeBackpack } from "../lib/cliente/certificaciones_onchain";
+import { obtenerBackpackProvider } from "../lib/cliente/wallet";
+import * as anchor from "@coral-xyz/anchor";
 import { formatearFechaHora } from "../lib/cliente/fechas";
 
 export default function UniversidadPage() {
@@ -145,38 +146,60 @@ export default function UniversidadPage() {
     event.preventDefault();
     setError("");
     setMensaje("");
+    setResultado(null);
 
-    const payload = await asignarTokenUniversidadOnchainDesdeBackpack({
-      walletUniversidad: wallet,
-      ...formAsignacion,
-      promedio: Number(formAsignacion.promedio),
+    // 1. Llamar al endpoint backend para obtener la transacción serializada
+    const resp = await fetch("/api/certifications/assign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        walletUniversidad: wallet,
+        ...formAsignacion,
+        promedio: Number(formAsignacion.promedio),
+      }),
     });
-
-    if (!payload.ok || !payload.data?.codigoRegistro) {
-      setResultado(null);
-      setError(payload.error || "No se pudo asignar el token de carrera.");
+    const payload = await resp.json();
+    if (!payload.ok || !payload.tx) {
+      setError(payload.error || "No se pudo preparar la transacción de asignación.");
       return;
     }
 
-    const codigoRegistro = payload.data.codigoRegistro;
-    const url = urlVerificacionRegistro(codigoRegistro);
-    let qrDataUrl = "";
+    // 2. Deserializar y firmar con Backpack
     try {
-      qrDataUrl = await QRCode.toDataURL(url, {
-        margin: 1,
-        color: { dark: "#0F1D34", light: "#F2F7FF" },
-        width: 220,
-      });
-    } catch {}
+      const provider = obtenerBackpackProvider();
+      if (!provider) throw new Error("No se detectó Backpack en el navegador");
+      await provider.connect({ onlyIfTrusted: false });
+      const connection = new anchor.web3.Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "http://127.0.0.1:8899", "confirmed");
+      const tx = anchor.web3.Transaction.from(Buffer.from(payload.tx, "base64"));
+      tx.feePayer = provider.publicKey;
+      // Firmar y enviar
+      const signed = await provider.signTransaction(tx);
+      const sig = await connection.sendRawTransaction(signed.serialize());
+      await connection.confirmTransaction(sig, "confirmed");
 
-    setResultado({
-      codigoRegistro,
-      qrDataUrl,
-      tokenCarreraId: payload.data.tokenCarreraId,
-      txAssign: payload.data?.transacciones?.assignTokenToGraduate || "",
-    });
-    setMensaje("Token de carrera transferido al egresado correctamente.");
-    await cargarEstado();
+      // 3. Mostrar resultado y QR
+      const codigoRegistro = payload.codigoRegistro;
+      const url = urlVerificacionRegistro(codigoRegistro);
+      let qrDataUrl = "";
+      try {
+        qrDataUrl = await QRCode.toDataURL(url, {
+          margin: 1,
+          color: { dark: "#0F1D34", light: "#F2F7FF" },
+          width: 220,
+        });
+      } catch {}
+
+      setResultado({
+        codigoRegistro,
+        qrDataUrl,
+        tokenCarreraId: payload.tokenCarreraId,
+        txAssign: sig,
+      });
+      setMensaje("Token de carrera transferido al egresado correctamente.");
+      await cargarEstado();
+    } catch (e) {
+      setError(e.message || "Error al firmar o enviar la transacción");
+    }
   }
 
   return (

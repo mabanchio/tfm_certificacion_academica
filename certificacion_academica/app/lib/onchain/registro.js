@@ -1,3 +1,114 @@
+/**
+ * Construye y serializa una transacción de asignación de token de lote a egresado para que la firme la wallet de universidad (Backpack).
+ * Devuelve la transacción serializada en base64 y los datos relevantes para mostrar en UI.
+ */
+export async function generarTransaccionAsignacionTokenUniversidad({ walletUniversidad, loteId, nombre, apellido, cuitCuil, promedio }) {
+  // Validaciones básicas
+  if (!walletValida(walletUniversidad)) return respuestaError("Wallet de universidad inválida");
+  const tokenId = parseTokenIdDesdeLoteId(loteId);
+  if (!tokenId) return respuestaError("Lote inválido para transferir token");
+  const nombreOk = String(nombre || "").trim();
+  const apellidoOk = String(apellido || "").trim();
+  const cuitCuilOk = String(cuitCuil || "").replace(/[^0-9]/g, "").slice(0, 11);
+  if (!nombreOk || !apellidoOk || !/^\d{11}$/.test(cuitCuilOk)) return respuestaError("Datos inválidos para asignación de token al egresado");
+
+  // Inicializar Anchor y programa
+  const { program } = getClient();
+  const { config } = await asegurarConfig();
+  const walletPubkey = toPublicKey(walletUniversidad);
+  const certificationToken = pdaCertificationToken(program.programId, walletPubkey, new anchor.BN(tokenId));
+  let lote;
+  try {
+    lote = await program.account.certificationToken.fetch(certificationToken);
+  } catch (_e) {
+    return respuestaError("Lote inexistente o no pertenece a la universidad");
+  }
+  if (Number(lote.cantidadDisponible || 0) < 1) return respuestaError("El lote seleccionado no tiene disponibilidad");
+
+  const programa = String(lote.titulo || "").trim();
+  const institucion = String(lote.universidad || "").trim();
+  if (!programa) return respuestaError("El lote on-chain no tiene titulo/carrera válido");
+  if (!institucion) return respuestaError("El lote on-chain no tiene universidad válida");
+
+  const institution = pdaInstitution(program.programId, walletPubkey);
+  // No registramos institución aquí, solo preparamos la transacción
+
+  // Leer el contador de credenciales
+  let configData;
+  try {
+    configData = await program.account.programConfig.fetch(config);
+  } catch (_e) {
+    return respuestaError("No se pudo leer configuración on-chain");
+  }
+  const credentialId = new anchor.BN(Number(configData.credentialCounter || 0) + 1);
+  const credential = pdaCredential(program.programId, walletPubkey, credentialId);
+
+  // Calcular recipient (igual que en cliente)
+  const recipient = new anchor.web3.PublicKey(
+    crypto.createHash("sha256").update(`${cuitCuilOk}|${nombreOk.toLowerCase()}|${apellidoOk.toLowerCase()}`).digest()
+  );
+  const now = Math.floor(Date.now() / 1000);
+  const payloadHash = JSON.stringify({
+    tipoCredencial: "Token de carrera",
+    nombre: nombreOk,
+    apellido: apellidoOk,
+    cuitCuil: cuitCuilOk,
+    programa,
+    institucion,
+    titularOnchain: recipient.toBase58(),
+    now,
+  });
+  const documentHash = Array.from(crypto.createHash("sha256").update(payloadHash).digest());
+  const metadataUri = `onchain://credential/${credentialId.toString()}`;
+
+  const fechaLote = asIso(lote.fechaCreacion).slice(0, 10);
+  const fechaTransferencia = new Date().toISOString().slice(0, 10);
+  const flujo = [
+    { actor: "Ministerio", paso: "Aprobacion de lote", fecha: fechaLote, estado: fechaLote ? "Completado" : "Pendiente" },
+    { actor: "Universidad", paso: "Transferencia al egresado", fecha: fechaTransferencia, estado: "Completado" },
+    { actor: "Universidad", paso: "Legalizacion interna", fecha: "", estado: "Pendiente" },
+    { actor: "Cancilleria", paso: "Apostilla", fecha: "", estado: "Pendiente" },
+  ];
+  const codigoRegistro = generarCodigoRegistro();
+
+  // Construir la instrucción SOLO con los argumentos esperados por el IDL
+  const tx = new anchor.web3.Transaction();
+  const ix = await program.methods
+    .assignTokenToGraduate(
+      credentialId,
+      recipient,
+      "Token de carrera",
+      programa,
+      new anchor.BN(now),
+      new anchor.BN(0), // expiryDate, se puede ajustar si aplica
+      documentHash,
+      metadataUri
+    )
+    .accounts({
+      config,
+      institution,
+      credential,
+      issuer: walletPubkey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    })
+    .instruction();
+  tx.add(ix);
+  tx.feePayer = walletPubkey;
+  tx.recentBlockhash = (await program.provider.connection.getLatestBlockhash()).blockhash;
+
+  // Serializar la transacción (sin firmar)
+  const serialized = tx.serialize({ requireAllSignatures: false, verifySignatures: false }).toString("base64");
+  return {
+    ok: true,
+    tx: serialized,
+    credentialId: credentialId.toString(),
+    codigoRegistro,
+    programa,
+    institucion,
+    recipient: recipient.toBase58(),
+    flujo,
+  };
+}
 import crypto from "crypto";
 import fs from "fs";
 import os from "os";
