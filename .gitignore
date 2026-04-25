@@ -88,3 +88,13 @@ ngrok.log
 # Artefactos documentales locales
 # -----------------------------
 certificacion_academica/storage/
+
+# Archivos y carpetas grandes que deben ser ignorados por git
+.solana-ledger/
+certificacion_academica/.next-build/
+certificacion_academica/.next-dev/
+certificacion_academica/public/
+certificacion_academica/target/
+*.sst
+*.tar.bz2
+*.bin
