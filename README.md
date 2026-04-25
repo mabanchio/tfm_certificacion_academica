@@ -2,11 +2,6 @@
 
 Este repositorio implementa un sistema blockchain para gestionar el circuito de certificacion de titulos en Argentina.
 
-## Idioma del proyecto
-- Todo el desarrollo se realiza en espanol.
-- Todo texto visible en la web debe estar en espanol.
-- Todos los comentarios de codigo deben estar en espanol.
-
 ## Alcance funcional
 - Emision digital verificable por universidad.
 - Legalizacion interna por universidad.
