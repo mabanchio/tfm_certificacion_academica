@@ -69,6 +69,3 @@ Este repositorio implementa un sistema blockchain para gestionar el circuito de 
   - roadmap.md
   - TFM_SOLANA_ACADEMIC_CERTIFICATES_TECHNICAL_GUIDE.md
   - Archivos grandes y secretos locales (ver .gitignore)
-
-## Proximo paso tecnico
-- Implementar estructura base del proyecto (programa Anchor + frontend Next.js) con modelos de rol, flujo de certificacion y verificador QR en espanol.
